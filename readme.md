@@ -7,4 +7,6 @@ To run you need to have pip installed the request package
 then run "py request.py"
 
 Please note
+    Contains exception errors atm
+
     I think the number of records that can be requested from the release website are limited and the records sent are not always the same for a given artist hence the releases that print out may vary.

@@ -1,6 +1,7 @@
 import requests
 import json
 import sys
+import statistics
 
 def GetInputData():
      artist = input("Enter artist/ band name....   ")
@@ -24,15 +25,26 @@ def GetResponseLyricDataFromWebSite(artist,song):
      return responselyric
 
 def GetSongFromSet(artist,songset):
+     lyricnumberlist = []
      for song in songset:
          responselyric = GetResponseLyricDataFromWebSite(artist,song)
-         lyricstring = GetLyricDataAsString(responselyric)
-         lyricstring = lyricstring.replace('\n',' ')
-         lyriclist = GetListFromTextString(lyricstring,' ')
-         lyriclist = filter(None, lyriclist)
-         y = [x for x in lyriclist if not ' ' in x]
-         print(len(y))
-     #print (lyric)
+         lyric = GetLyricDataAsString(responselyric)
+         lyriclist = CreateListofWordsFromLyricString(lyric)
+         lyricnumberlist.append(len(lyriclist))
+     #print (lyricnumberlist)
+     return lyricnumberlist
+
+def CreateListofWordsFromLyricString(lyricstring):
+        lyricstring = lyricstring.replace('\n',' ')
+        lyriclist = GetListFromTextString(lyricstring,' ')
+        lyriclist = filter(None, lyriclist)
+        revisedlist = [word for word in lyriclist if not ' ' in word]
+        return revisedlist
+
+def GetMeanAndMedianFromListofNumbers(lyricnumberlist):
+    print (lyricnumberlist)
+    print (f'Mean number of lyrics is  {sum(lyricnumberlist)/len(lyricnumberlist)}')  
+    print (f'Median number of lyrics is  {statistics.median(lyricnumberlist)}')
 
 def RemoveFinalNCharactersFromStringEnd(TextString,n):
     TextString = TextString[0:-n]
@@ -62,9 +74,13 @@ def GetSongTitleAsString(response):
       songstring = songstring.replace(' / ','--')
       return songstring
 
-def GetLyricDataAsString(responselyric): 
-      lyricstring = responselyric.json()['lyrics']
-      return lyricstring
+def GetLyricDataAsString(responselyric):
+    lyricstring = ''
+    try: 
+        lyricstring = responselyric.json()['lyrics']                  
+    except Exception as e:       
+        print (f'exception error {e} ')
+    return lyricstring
 
 def GetListFromTextString(Textstring,delimiter):
     newlist = set(Textstring.split(delimiter))
@@ -86,7 +102,9 @@ response = GetResponseArtistSongDataFromWebSite(brainstring)
 songstring = GetSongTitleAsString(response)
 songstring = RemoveFinalNCharactersFromStringEnd(songstring,2)
 titleset = GetSetFromTextString(songstring,'--')
-GetSongFromSet(artist,titleset)
+lyricnumberlist = GetSongFromSet(artist,titleset)
+GetMeanAndMedianFromListofNumbers(lyricnumberlist)
+#print (lyricsonglist)
 
 
 #responselyric = GetResponseLyricDataFromWebSite()
