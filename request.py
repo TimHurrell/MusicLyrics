@@ -24,22 +24,29 @@ def GetResponseLyricDataFromWebSite(artist,song):
      responselyric = requests.get(f'https://api.lyrics.ovh/v1/{artist}/{song}')
      return responselyric
 
+
+
 def GetSongFromSet(artist,songset):
-     lyricnumberlist = []
-     for song in songset:
-         responselyric = GetResponseLyricDataFromWebSite(artist,song)
-         lyric = GetLyricDataAsString(responselyric)
-         lyriclist = CreateListofWordsFromLyricString(lyric)
-         lyricnumberlist.append(len(lyriclist))
-     #print (lyricnumberlist)
-     return lyricnumberlist
+    lyricnumberlist = []
+    for song in songset:
+        responselyric = GetResponseLyricDataFromWebSite(artist,song)
+        lyric = GetLyricDataAsString(responselyric)
+        lyriclist = CreateListofWordsFromLyricString(lyric)
+        if len(lyriclist) > 1:
+           lyricnumberlist.append(len(lyriclist))
+    return lyricnumberlist
 
 def CreateListofWordsFromLyricString(lyricstring):
+    try:
         lyricstring = lyricstring.replace('\n',' ')
         lyriclist = GetListFromTextString(lyricstring,' ')
         lyriclist = filter(None, lyriclist)
         revisedlist = [word for word in lyriclist if not ' ' in word]
-        return revisedlist
+    except Exception as e:       
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        print (template.format(type(e).__name__, e.args))
+        revisedlist = [1]
+    return revisedlist
 
 def GetMeanAndMedianFromListofNumbers(lyricnumberlist):
     print (lyricnumberlist)
@@ -58,29 +65,33 @@ def GetYearFromDate(date):
 
 
 def GetSongTitleAsString(response): 
-      songstring = ''
-      a = 0
-      for data in response.json()['releases']:
-            a = a + 1
-            release_status = data.get('status')
-            release_title = data.get('title')
-            release_type = data['release-group'].get('primary-type')
-            try:
-                if release_type == "Single" and release_status == "Official":
-                    songstring = songstring + release_title + "--"
-                    
-            except Exception as e:       
-                 print (f'exception error {e} ')
-      songstring = songstring.replace(' / ','--')
-      return songstring
+    songstring = ''
+    a = 0
+    for data in response.json()['releases']:
+        a = a + 1
+        release_status = data.get('status')
+        release_title = data.get('title')
+        release_type = data['release-group'].get('primary-type')
+        try:
+            if release_type == "Single" and release_status == "Official":
+                songstring = songstring + release_title + "--"                   
+        except Exception as e:       
+            print (f'exception error {e} ')
+    songstring = songstring.replace(' / ','--')
+    return songstring
 
 def GetLyricDataAsString(responselyric):
-    lyricstring = ''
-    try: 
-        lyricstring = responselyric.json()['lyrics']                  
-    except Exception as e:       
-        print (f'exception error {e} ')
+    if 'json' in responselyric.headers.get('Content-Type'):
+        lyricstring = responselyric.json().get('lyrics')
+        print ('processing lyrics')
+    else:
+        print('Response content is not in JSON format.')
+        lyricstring = 'spam'
+    if lyricstring is None:
+        lyricstring = 'Nonetype'
+        print('Empty Lyric String')
     return lyricstring
+
 
 def GetListFromTextString(Textstring,delimiter):
     newlist = set(Textstring.split(delimiter))
@@ -104,29 +115,6 @@ songstring = RemoveFinalNCharactersFromStringEnd(songstring,2)
 titleset = GetSetFromTextString(songstring,'--')
 lyricnumberlist = GetSongFromSet(artist,titleset)
 GetMeanAndMedianFromListofNumbers(lyricnumberlist)
-#print (lyricsonglist)
-
-
-#responselyric = GetResponseLyricDataFromWebSite()
-#lyricstring = GetLyricDataAsString(responselyric)
-#lyricstring = lyricstring.replace('\n',' ')
-#lyriclist = GetListFromTextString(lyricstring,' ')
-#lyriclist = filter(None, lyriclist)
-#y = [x for x in lyriclist if not ' ' in x]
-#print (y)
-#print(len(y))
-
-#
-
-
-
-#albumlist = GetListFromTextString(albumstring,'--')
-#zipped_list = ZipListsAndSortOnColumn(albumlist, yearlist,1,True)
-
-
-#ITERATION_LIMIT = 10
-#for data in (zipped_list[0:ITERATION_LIMIT]):
-#           print (data[0] + ' ' + data[1])
 
 
 
