@@ -5,7 +5,7 @@ import statistics
 
 def GetInputData():
      artist = input("Enter artist/ band name....   ")
-     print("You have entered " + artist)
+     print("/n/n")
      return artist
 
 
@@ -32,8 +32,13 @@ def GetSongFromSet(artist,songset):
         responselyric = GetResponseLyricDataFromWebSite(artist,song)
         lyric = GetLyricDataAsString(responselyric)
         lyriclist = CreateListofWordsFromLyricString(lyric)
-        if len(lyriclist) > 1:
-           lyricnumberlist.append(len(lyriclist))
+        songinfo = mySongLyrics()
+        songinfo.artist = artist
+        songinfo.songname = song
+        songinfo.numberofwords = len(lyriclist)
+        songinfo.description()
+        if songinfo.numberofwords > 1:
+           lyricnumberlist.append(songinfo.numberofwords)
     return lyricnumberlist
 
 def CreateListofWordsFromLyricString(lyricstring):
@@ -49,20 +54,12 @@ def CreateListofWordsFromLyricString(lyricstring):
     return revisedlist
 
 def GetMeanAndMedianFromListofNumbers(lyricnumberlist):
-    print (lyricnumberlist)
     print (f'Mean number of lyrics is  {sum(lyricnumberlist)/len(lyricnumberlist)}')  
     print (f'Median number of lyrics is  {statistics.median(lyricnumberlist)}')
 
 def RemoveFinalNCharactersFromStringEnd(TextString,n):
     TextString = TextString[0:-n]
     return TextString
-
-
-def GetYearFromDate(date):
-    Year = date[0:4]
-    return Year
-
-
 
 def GetSongTitleAsString(response): 
     songstring = ''
@@ -80,10 +77,12 @@ def GetSongTitleAsString(response):
     songstring = songstring.replace(' / ','--')
     return songstring
 
+
+         
+
 def GetLyricDataAsString(responselyric):
     if 'json' in responselyric.headers.get('Content-Type'):
         lyricstring = responselyric.json().get('lyrics')
-        print ('processing lyrics')
     else:
         print('Response content is not in JSON format.')
         lyricstring = 'spam'
@@ -102,9 +101,13 @@ def GetSetFromTextString(Textstring,delimiter):
     return newset
 
 
-def ZipListsAndSortOnColumn(List1,List2,n,sorttype):
-    zipped_list = (sorted(list(zip(List1, List2)), key=lambda x: x[n], reverse = sorttype))
-    return zipped_list
+class mySongLyrics:
+    artist = "artist"
+    songname = "name"
+    numberofwords = 0
+
+    def description(self):
+         print (f'{self.artist} released "{self.songname}" which contained {self.numberofwords} words')
 
 
 artist = GetInputData() 
