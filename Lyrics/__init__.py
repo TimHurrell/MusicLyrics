@@ -54,6 +54,7 @@ def CreateListofWordsFromLyricString(lyricstring):
     return revisedlist
 
 def GetMeanAndMedianFromListofNumbers(lyricnumberlist):
+    return sum(lyricnumberlist)/len(lyricnumberlist)
     print (f'Mean number of lyrics is  {sum(lyricnumberlist)/len(lyricnumberlist)}')  
     print (f'Median number of lyrics is  {statistics.median(lyricnumberlist)}')
 
@@ -110,14 +111,23 @@ class mySongLyrics:
          print (f'{self.artist} released "{self.songname}" which contained {self.numberofwords} words')
 
 
-artist = GetInputData() 
-brainstring = GetUrlForWebsite(artist) 
-response = GetResponseArtistSongDataFromWebSite(brainstring)
-songstring = GetSongTitleAsString(response)
-songstring = RemoveFinalNCharactersFromStringEnd(songstring,2)
-titleset = GetSetFromTextString(songstring,'--')
-lyricnumberlist = GetSongFromSet(artist,titleset)
-GetMeanAndMedianFromListofNumbers(lyricnumberlist)
+
+def main():    
+    artist = GetInputData() 
+    brainstring = GetUrlForWebsite(artist) 
+    response = GetResponseArtistSongDataFromWebSite(brainstring)
+    songstring = GetSongTitleAsString(response)
+    songstring = RemoveFinalNCharactersFromStringEnd(songstring,2)
+    titleset = GetSetFromTextString(songstring,'--')
+    lyricnumberlist = GetSongFromSet(artist,titleset)
+    GetMeanAndMedianFromListofNumbers(lyricnumberlist)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 

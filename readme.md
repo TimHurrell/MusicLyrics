@@ -5,7 +5,7 @@ searches for the singles release on one website and finds the singles lyrics on 
 It prints the number of words in each song lyrics.  
 
 To run you need to have pip installed the request package  
-then run "py request.py"
+then run "py __init__.py" in the lyrics folder
 
 ##Please note
     Make take 10 minutes or so to run  
